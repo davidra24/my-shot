@@ -1,0 +1,23 @@
+.default-user__container {
+  display: flex;
+  width: 100%;
+  padding-top: 3rem;
+  justify-content: space-around;
+  color: black;
+  margin: auto;
+}
+
+.card-content__default {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
