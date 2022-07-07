@@ -30,7 +30,6 @@ export const Login = () => {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email.value, password.value);
-      setIsLoading(false);
     } catch (error) {
       errorAlert('Error', 'No se ha podido loggear en My Shot');
       setIsLoading(false);
@@ -50,10 +49,7 @@ export const Login = () => {
         email: email.value,
         role: 'default'
       });
-      setIsLoading(false);
     } catch (error: any) {
-      console.log(error.message);
-
       setIsLoading(false);
       switch (error.code) {
         case 'auth/weak-password':

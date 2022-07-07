@@ -1,13 +1,14 @@
 import {
   ActionModel,
   ActionTypes,
-  StateModel,
   StateReducerModel
 } from '../models/redux.model';
-import { SET_LOADING } from './constants';
+import { SET_COCTAILS, SET_DRINKS, SET_USER } from './constants';
 
 export const initialState: StateReducerModel = {
-  isLoading: false
+  user: undefined,
+  coctails: undefined,
+  drinks: undefined
 };
 
 export const reducer = (
@@ -15,12 +16,21 @@ export const reducer = (
   action: ActionModel<string, ActionTypes>
 ) => {
   switch (action.type) {
-    case SET_LOADING:
+    case SET_USER:
       return {
         ...state,
-        isLoading: action.payload
+        user: action.payload
       };
-      break;
+    case SET_DRINKS:
+      return {
+        ...state,
+        drinks: action.payload
+      };
+    case SET_COCTAILS:
+      return {
+        ...state,
+        coctails: action.payload
+      };
     default:
       return state;
   }

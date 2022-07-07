@@ -1,0 +1,16 @@
+.drinks__container {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.drinks__container .drinks__image {
+  height: 300px;
+  object-fit: scale-down;
+}
+
+.add__drink {
+  cursor: pointer;
+  margin: auto;
+}

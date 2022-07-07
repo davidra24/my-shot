@@ -5,6 +5,7 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import { configureStore } from './redux';
+import { HashRouter } from 'react-router-dom';
 import './styles/index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -15,11 +16,13 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <Provider store={store}>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </Provider>
+  <React.StrictMode>
+    <Provider store={store}>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </Provider>
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change

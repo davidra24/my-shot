@@ -2,7 +2,9 @@
   display: flex;
   width: 100%;
   padding-top: 3rem;
-  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
   color: black;
   margin: auto;
 }
@@ -20,4 +22,9 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+}
+
+.drinks__image {
+  height: 250px;
+  object-fit: scale-down;
 }

@@ -6,50 +6,73 @@ import { Login } from './pages/Login';
 import './styles/App.css';
 import { Main } from './pages/Main';
 import { UserModel } from './models/user.model';
+import { Navbar } from './components/Navbar';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Drinks } from './pages/Drinks';
+import { Orders } from './pages/Orders';
+import { useDispatch } from 'react-redux';
+import { setUserAction } from './redux/actions';
 
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
 function App() {
   const [user, setUser] = useState<UserModel>();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   async function getRole(uid: string) {
     const docuRef = doc(firestore, `users/${uid}`);
     const docuCifrada = await getDoc(docuRef);
     /** @ts-ignore */
-    const infoFinal = await docuCifrada.data().role;
-    return infoFinal;
+    const usuario = await docuCifrada.data().role;
+    return usuario;
   }
 
   function setUserWithFirebaseAndRol(userFirebase: User) {
-    getRole(userFirebase.uid).then((role) => {
+    getRole(userFirebase.uid).then((role: string) => {
       const userData: UserModel = {
         uid: userFirebase.uid,
         email: userFirebase.email,
         role
       };
       setUser(userData);
+      dispatch(setUserAction(userData));
     });
   }
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (userFirebase) => {
+    onAuthStateChanged(auth, (userFirebase) => {
       if (userFirebase) {
-        await setUserWithFirebaseAndRol(userFirebase);
+        setUserWithFirebaseAndRol(userFirebase);
       } else {
         setUser(undefined);
       }
     });
   }, []);
 
-  const logout = () => signOut(auth);
+  const logout = () => {
+    signOut(auth);
+    setUser(undefined);
+    navigate('/', { replace: true });
+  };
 
   return (
     <div className='App'>
       <header className='App-header'>
-        <h1>My Shot</h1>
+        <Navbar user={user} logout={logout} />
       </header>
-      {user ? <Main user={user} logout={logout} /> : <Login />}
+      {user ? (
+        <Routes>
+          <Route path='/' element={<Main user={user} />} />
+          <Route path='/drinks' element={<Drinks />} />
+          <Route path='/orders' element={<Orders />} />
+        </Routes>
+      ) : (
+        <Routes location='/'>
+          <Route path='/' element={<Login />} />
+        </Routes>
+      )}
     </div>
   );
 }
