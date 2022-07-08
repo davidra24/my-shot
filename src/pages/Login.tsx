@@ -3,7 +3,8 @@ import { firebaseApp } from '../firebase';
 import {
   getAuth,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -15,7 +16,9 @@ import {
 import '../styles/login.css';
 import { useState } from 'react';
 import { Loader } from '../components/Loader';
-import { errorAlert } from '../components/alerts';
+import { errorAlert, successAlert, warningAlert } from '../components/alerts';
+import { Button, Card, Form } from 'react-bootstrap';
+import { REGEX_EMAIL } from '../utils';
 
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
@@ -24,6 +27,28 @@ export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const email = useInputValue('');
   const password = useInputValue('');
+
+  const resetPassword = () => {
+    try {
+      if (REGEX_EMAIL.test(email.value)) {
+        password.setDefaultValue();
+        sendPasswordResetEmail(auth, email.value);
+        successAlert(
+          'Reestablecimiento',
+          'Se ha enviado un correo para su cambio de contraseña [Revisa el Spam]'
+        );
+      } else {
+        warningAlert(
+          'Advertencia',
+          'No ha ingresado un correo valido en la app'
+        );
+      }
+    } catch (error) {
+      console.log(error);
+
+      warningAlert('Advertencia', 'No ha ingresado un correo valido en la app');
+    }
+  };
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -71,39 +96,39 @@ export const Login = () => {
   return (
     <>
       {isLoading && <Loader />}
-      <form className='login__container' onSubmit={handleLogin}>
-        <label htmlFor='exampleFormControlInput1' className='form-label'>
-          Correo electrónico
-        </label>
-        <input
-          type='email'
-          className='form-control form-control-lg'
-          id='exampleFormControlInput1'
-          placeholder='name@example.com'
-          value={email.value}
-          onChange={email.onChange}
-        />
-        <label htmlFor='exampleFormControlTextarea1' className='form-label'>
-          Contraseña
-        </label>
-        <input
-          type='password'
-          className='form-control form-control-lg'
-          id='inputPassword'
-          value={password.value}
-          onChange={password.onChange}
-        />
-        <button type='submit' className='btn btn-primary btn-lg button__login'>
-          Iniciar Sesión
-        </button>
-        <button
-          type='button'
-          className='btn btn-outline-light button__login'
-          onClick={handleRegister}
-        >
-          Registrarse
-        </button>
-      </form>
+      <Form onSubmit={handleLogin}>
+        <Form.Group className='login__container' onSubmit={handleLogin}>
+          <Form.Label className='form-label'>Correo electrónico</Form.Label>
+          <Form.Control
+            type='email'
+            placeholder='emomipasion@hotmail.com'
+            value={email.value}
+            onChange={email.onChange}
+          />
+        </Form.Group>
+        <Form.Group className='login__container'>
+          <Form.Label className='form-label'>Contraseña</Form.Label>
+          <Form.Control
+            type='password'
+            placeholder='Password'
+            value={password.value}
+            onChange={password.onChange}
+          />
+          <Button variant='success' type='submit' className='button__login'>
+            Iniciar Sesión
+          </Button>
+          <Button
+            variant='outline-light'
+            className='button__login'
+            onClick={handleRegister}
+          >
+            Registrarse
+          </Button>
+          <Card.Link className='button__forget' onClick={resetPassword}>
+            Olvide mi contraseña
+          </Card.Link>
+        </Form.Group>
+      </Form>
     </>
   );
 };

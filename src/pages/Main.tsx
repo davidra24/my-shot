@@ -7,10 +7,12 @@ interface mainProps {
 }
 
 export const Main = ({ user }: mainProps) => {
+  const mail = user?.email || '';
   return (
     <div className='main__container'>
       <div className='main__container-user'>
-        Bienvenido(a) {user?.email}, a tu aplicación de Cocteles
+        Bienvenido(a) {mail.substring(0, mail.indexOf(':'))}, a tu aplicación de
+        Cocteles
       </div>
       <Coctails />
     </div>

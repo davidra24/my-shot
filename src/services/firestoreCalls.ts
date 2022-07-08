@@ -1,4 +1,4 @@
-import { throws } from 'assert';
+import { getAuth } from 'firebase/auth';
 import {
   collection,
   doc,
@@ -6,10 +6,12 @@ import {
   getFirestore,
   setDoc
 } from 'firebase/firestore';
-import { errorAlert } from '../components/alerts';
+import { errorAlert, successAlert } from '../components/alerts';
 import { firebaseApp } from '../firebase';
-import { IDrink } from '../models/coctails.model';
+import { ICoctail, IDrink } from '../models/coctails.model';
+import { convertOzToMl } from '../utils/units';
 
+const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
 export const callDrinks = async () => {
@@ -31,6 +33,39 @@ export const updateDrink = async (uid: string, drink: IDrink) => {
   try {
     const docuRef = doc(firestore, `drinks/${uid}`);
     await setDoc(docuRef, { ...drink });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createOrder = async (
+  coctail: ICoctail,
+  drinks?: Array<IDrink>
+) => {
+  try {
+    const ordersRef = collection(firestore, 'orders');
+    const documentRef = doc(ordersRef);
+    await setDoc(documentRef, {
+      userId: auth.currentUser?.uid,
+      userEmail: auth.currentUser?.email,
+      coctailId: coctail.uid,
+      coctailName: coctail.name,
+      active: true
+    });
+    coctail.ingredients.forEach(async (ingredient) => {
+      const finded = drinks?.find((drink) => drink.uid === ingredient.id);
+      if (finded) {
+        const available =
+          Number(finded.available) - Number(convertOzToMl(ingredient.measure));
+        console.log(ingredient.name, available);
+
+        const drink = {
+          ...finded,
+          available
+        };
+        await updateDrink(ingredient.id, drink);
+      }
+    });
   } catch (error) {
     throw error;
   }

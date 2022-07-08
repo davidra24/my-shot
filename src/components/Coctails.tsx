@@ -13,6 +13,11 @@ import { Loader } from './Loader';
 import '../styles/coctails.css';
 import { getAuth } from 'firebase/auth';
 import { Button, Card } from 'react-bootstrap';
+import { callDrinks, createOrder } from '../services/firestoreCalls';
+import { useSelector } from 'react-redux';
+import { StateModel } from '../models/redux.model';
+import { useDispatch } from 'react-redux';
+import { setDrinksAction } from '../redux/actions';
 
 const firestore = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
@@ -20,6 +25,8 @@ const auth = getAuth(firebaseApp);
 export const Coctails = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [coctails, setCoctails] = useState<Array<ICoctail>>([]);
+  const drinks = useSelector((state: StateModel) => state.reducer.drinks);
+  const dispatch = useDispatch();
 
   const getContails = async () => {
     setIsLoading(true);
@@ -40,30 +47,36 @@ export const Coctails = () => {
     }
   };
 
-  const orderCoctail = async (coctail: string) => {
+  const orderCoctail = async (coctail: ICoctail) => {
     setIsLoading(true);
     try {
-      const user = auth.currentUser?.uid;
-      const ordersRef = collection(firestore, 'orders');
-      const documentRef = doc(ordersRef);
-      await setDoc(documentRef, {
-        user,
-        coctail,
-        active: true
-      });
-      successAlert(
-        'Exitoso',
-        'No se ha registrado tu pedido, en un segundo te lo entregaremos'
-      );
+      await createOrder(coctail, drinks);
+      await getAllDrinks();
       setIsLoading(false);
+      return successAlert(
+        'Exitoso',
+        'Se ha registrado tu pedido, en un segundo te lo entregaremos'
+      );
     } catch (error) {
       errorAlert('Error', 'No se ha podido registrar tu pedido');
       setIsLoading(false);
     }
   };
 
+  const getAllDrinks = async () => {
+    const allDrinks = await callDrinks();
+    dispatch(setDrinksAction(allDrinks));
+  };
+
+  const initialFunctions = async () => {
+    if (!drinks) {
+      getAllDrinks();
+    }
+    await getContails();
+  };
+
   useEffect(() => {
-    getContails();
+    initialFunctions();
   }, []);
 
   return (
@@ -92,10 +105,7 @@ export const Coctails = () => {
                 </Card.Text>
               </Card.Body>
               <Card.Footer>
-                <Button
-                  variant='primary'
-                  onClick={() => orderCoctail(coctail.uid)}
-                >
+                <Button variant='primary' onClick={() => orderCoctail(coctail)}>
                   Dame este
                 </Button>
               </Card.Footer>

@@ -22,3 +22,7 @@ export const successAlert = (title: string, text: string) => {
 export const errorAlert = (title: string, text: string) => {
   Toast.fire({ title, icon: 'error', text });
 };
+
+export const warningAlert = (title: string, text: string) => {
+  Toast.fire({ title, icon: 'warning', text });
+};
