@@ -4,6 +4,7 @@ import { Alert, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { errorAlert } from '../components/alerts';
+import { Drink } from '../components/Drink';
 import { Loader } from '../components/Loader';
 import { ModalAddDrink } from '../components/modals/ModalAddDrink';
 import { firebaseApp } from '../firebase';
@@ -32,6 +33,8 @@ export const Drinks = () => {
       dispatch(setDrinksAction(drinks));
       setIsLoading(false);
     } catch (error) {
+      errorAlert('Error', 'No se han encontrado bebidas');
+      dispatch(setDrinksAction([]));
       setIsLoading(false);
     }
   };
@@ -71,18 +74,11 @@ export const Drinks = () => {
         <div className='drinks__container'>
           {drinks &&
             drinks.map((drink: IDrink) => (
-              <Card key={drink.uid} style={{ width: '18rem' }}>
-                <Card.Img
-                  variant='top'
-                  className='drinks__image'
-                  src={drink.image}
-                />
-                <Card.Body>
-                  <Card.Title style={{ color: 'black' }}>
-                    {drink.name}
-                  </Card.Title>
-                </Card.Body>
-              </Card>
+              <Drink
+                key={drink.uid}
+                drink={drink}
+                getUpdatedDrinks={getAllDrinks}
+              />
             ))}
           <Card style={{ width: '18rem' }}>
             <Card.Body>

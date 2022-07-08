@@ -16,6 +16,7 @@ export interface IDrink {
   uid: string;
   name: string;
   image: string;
+  available: number;
 }
 
 export interface IOrder {

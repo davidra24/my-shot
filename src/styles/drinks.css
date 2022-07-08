@@ -14,3 +14,16 @@
   cursor: pointer;
   margin: auto;
 }
+
+.card-drinks__more {
+  display: flex;
+  flex-direction: column;
+}
+
+.mini__loading-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,4 +1,11 @@
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { throws } from 'assert';
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  setDoc
+} from 'firebase/firestore';
 import { errorAlert } from '../components/alerts';
 import { firebaseApp } from '../firebase';
 import { IDrink } from '../models/coctails.model';
@@ -16,7 +23,15 @@ export const callDrinks = async () => {
     });
     return documents;
   } catch (error) {
-    errorAlert('Error', 'No se han encontrado bebidas');
-    return undefined;
+    throw error;
+  }
+};
+
+export const updateDrink = async (uid: string, drink: IDrink) => {
+  try {
+    const docuRef = doc(firestore, `drinks/${uid}`);
+    await setDoc(docuRef, { ...drink });
+  } catch (error) {
+    throw error;
   }
 };
