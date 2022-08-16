@@ -1,15 +1,19 @@
 import {
+  setAllOrdersActions,
   setCoctailsAction,
   setDrinksAction,
+  setMyOrdersActions,
   setUserAction
 } from '../redux/actions';
-import { ICoctail, IDrink } from './coctails.model';
+import { ICoctail, IDrink, IOrder } from './coctails.model';
 import { UserModel } from './user.model';
 
 export interface StateReducerModel {
   user?: UserModel;
-  coctails?: Array<ICoctail>;
-  drinks?: Array<IDrink>;
+  coctails: Array<ICoctail>;
+  drinks: Array<IDrink>;
+  myOrders: Array<IOrder>;
+  allOrders: Array<IOrder>;
 }
 
 export interface StateModel {
@@ -24,6 +28,8 @@ export interface ActionModel<T, P> {
 type ACTION_TYPE =
   | typeof setUserAction
   | typeof setDrinksAction
-  | typeof setCoctailsAction;
+  | typeof setCoctailsAction
+  | typeof setMyOrdersActions
+  | typeof setAllOrdersActions;
 
 export type ActionTypes = ReturnType<ACTION_TYPE>;

@@ -10,11 +10,6 @@
   object-fit: scale-down;
 }
 
-.add__drink {
-  cursor: pointer;
-  margin: auto;
-}
-
 .card-drinks__more {
   display: flex;
   flex-direction: column;

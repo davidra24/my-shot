@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Card, Form } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { useInputValue } from '../hooks/useInput';
 import { IDrink } from '../models/coctails.model';
-import { StateModel } from '../models/redux.model';
-import { updateDrink } from '../services/firestoreCalls';
+import { updateDrink } from '../services/drinks.services';
 import { MiniLoading } from './MiniLoading';
 
 interface drinkProps {
@@ -52,7 +50,7 @@ export const Drink = ({ drink, getUpdatedDrinks }: drinkProps) => {
               <Card.Title style={{ color: 'black' }}>{drink.name}</Card.Title>
               <div className='card-drinks__more'>
                 <Card.Text style={{ color: 'black' }}>
-                  Disponible: {drink.available}{' '}
+                  Disponible: {drink.available.toFixed(1)}{' '}
                   {drink.available < 1000 ? 'ml' : 'lt'}
                 </Card.Text>
                 {addMl ? (
@@ -69,7 +67,7 @@ export const Drink = ({ drink, getUpdatedDrinks }: drinkProps) => {
                         placeholder='ml'
                         style={{ width: '70%' }}
                         value={available.value}
-                        onChange={available.onChange}
+                        onChange={(e) => available.onChange(e)}
                       />
                       <Card.Link
                         style={{ cursor: 'pointer' }}

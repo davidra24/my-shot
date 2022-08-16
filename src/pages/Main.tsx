@@ -1,17 +1,17 @@
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Coctails } from '../components/Coctails';
-import { UserModel } from '../models/user.model';
+import { StateModel } from '../models/redux.model';
 import '../styles/main.css';
 
-interface mainProps {
-  user: UserModel | undefined;
-}
-
-export const Main = ({ user }: mainProps) => {
+export const Main = () => {
+  const user = useSelector((state: StateModel) => state.reducer.user);
   const mail = user?.email || '';
+
   return (
     <div className='main__container'>
       <div className='main__container-user'>
-        Bienvenido(a) {mail.substring(0, mail.indexOf(':'))}, a tu aplicación de
+        Bienvenido(a) {mail.substring(0, mail.indexOf('@'))}, a tu aplicación de
         Cocteles
       </div>
       <Coctails />

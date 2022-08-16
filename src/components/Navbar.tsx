@@ -1,15 +1,18 @@
 import { MouseEventHandler, useState } from 'react';
 import { Offcanvas } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { UserModel } from '../models/user.model';
+import { useUserIsAdmin } from '../hooks/useUserIsAdmin';
+import { StateModel } from '../models/redux.model';
 import '../styles/navbar.css';
 
 interface navbarProps {
-  user: UserModel | undefined;
   logout: MouseEventHandler<HTMLElement>;
 }
 
-export const Navbar = ({ user, logout }: navbarProps) => {
+export const Navbar = ({ logout }: navbarProps) => {
+  const user = useSelector((state: StateModel) => state.reducer.user);
+  const userIsAdmin = useUserIsAdmin();
   const [show, setShow] = useState<boolean>(false);
 
   const handleClose = () => setShow(false);
@@ -50,15 +53,12 @@ export const Navbar = ({ user, logout }: navbarProps) => {
                       Pedidos
                     </Link>
                   </button>
-                  {user?.role === 'admin' && (
-                    <>
-                      <button type='button' className='btn'>
-                        <Link to='/drinks' style={{ textDecoration: 'none' }}>
-                          Bebidas
-                        </Link>
-                      </button>
-                    </>
-                  )}
+                  <button type='button' className='btn'>
+                    <Link to='/drinks' style={{ textDecoration: 'none' }}>
+                      Bebidas
+                    </Link>
+                  </button>
+                  {userIsAdmin && <></>}
                   <button type='button' className='btn'>
                     <Link to='/customize' style={{ textDecoration: 'none' }}>
                       Coctel personalizado

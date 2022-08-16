@@ -1,32 +1,33 @@
 import { useEffect, useState } from 'react';
 import { firebaseApp } from '../firebase';
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  setDoc
-} from 'firebase/firestore';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { ICoctail } from '../models/coctails.model';
 import { errorAlert, successAlert } from './alerts';
 import { Loader } from './Loader';
-import '../styles/coctails.css';
-import { getAuth } from 'firebase/auth';
 import { Button, Card } from 'react-bootstrap';
-import { callDrinks, createOrder } from '../services/firestoreCalls';
+import { callDrinks, createOrder } from '../services';
 import { useSelector } from 'react-redux';
 import { StateModel } from '../models/redux.model';
 import { useDispatch } from 'react-redux';
 import { setDrinksAction } from '../redux/actions';
+import { AddCard } from './AddCard';
+import { useUserIsAdmin } from '../hooks/useUserIsAdmin';
+import { ModalAddCoctail } from './modals/ModalAddCoctail';
+import '../styles/coctails.css';
 
 const firestore = getFirestore(firebaseApp);
-const auth = getAuth(firebaseApp);
 
 export const Coctails = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [coctails, setCoctails] = useState<Array<ICoctail>>([]);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const userIsAdmin = useUserIsAdmin();
+
   const drinks = useSelector((state: StateModel) => state.reducer.drinks);
   const dispatch = useDispatch();
+
+  const handleClose = () => setShowModal(false);
+  const handleShow = () => setShowModal(true);
 
   const getContails = async () => {
     setIsLoading(true);
@@ -64,12 +65,16 @@ export const Coctails = () => {
   };
 
   const getAllDrinks = async () => {
-    const allDrinks = await callDrinks();
-    dispatch(setDrinksAction(allDrinks));
+    try {
+      const allDrinks = await callDrinks();
+      dispatch(setDrinksAction(allDrinks));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const initialFunctions = async () => {
-    if (!drinks) {
+    if (!drinks || !drinks.length) {
       getAllDrinks();
     }
     await getContails();
@@ -111,6 +116,15 @@ export const Coctails = () => {
               </Card.Footer>
             </Card>
           ))}
+          {userIsAdmin && (
+            <AddCard handleShow={handleShow}>
+              <ModalAddCoctail
+                show={showModal}
+                handleClose={handleClose}
+                setIsLoading={setIsLoading}
+              />
+            </AddCard>
+          )}
         </div>
       )}
     </>

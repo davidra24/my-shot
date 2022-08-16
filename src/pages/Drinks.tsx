@@ -1,18 +1,19 @@
 import { collection, doc, getFirestore, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { Alert, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { AddCard } from '../components/AddCard';
 import { errorAlert } from '../components/alerts';
 import { Drink } from '../components/Drink';
 import { Loader } from '../components/Loader';
 import { ModalAddDrink } from '../components/modals/ModalAddDrink';
 import { firebaseApp } from '../firebase';
 import { useInputValue } from '../hooks/useInput';
+import { useUserIsAdmin } from '../hooks/useUserIsAdmin';
 import { IDrink } from '../models/coctails.model';
 import { StateModel } from '../models/redux.model';
 import { setDrinksAction } from '../redux/actions';
-import { callDrinks } from '../services/firestoreCalls';
+import { callDrinks } from '../services/drinks.services';
 import '../styles/drinks.css';
 
 const firestore = getFirestore(firebaseApp);
@@ -20,8 +21,7 @@ const firestore = getFirestore(firebaseApp);
 export const Drinks = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
-  const name = useInputValue('');
-  const image = useInputValue('');
+  const userIsAdmin = useUserIsAdmin();
 
   const drinks = useSelector((state: StateModel) => state.reducer.drinks);
   const dispatch = useDispatch();
@@ -42,27 +42,8 @@ export const Drinks = () => {
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
-  const save = async () => {
-    setIsLoading(true);
-    try {
-      const drinksRef = collection(firestore, 'drinks');
-      const documentRef = doc(drinksRef);
-      await setDoc(documentRef, {
-        name: name.value,
-        image: image.value
-      });
-      name.setDefaultValue();
-      image.setDefaultValue();
-      getAllDrinks();
-    } catch (error) {
-      console.log(error);
-      errorAlert('Error', 'No se han podido registrar bebidas');
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (!drinks) {
+    if (!drinks || !drinks.length) {
       getAllDrinks();
     }
   }, []);
@@ -80,22 +61,16 @@ export const Drinks = () => {
                 getUpdatedDrinks={getAllDrinks}
               />
             ))}
-          <Card style={{ width: '18rem' }}>
-            <Card.Body>
-              <Card.Img
-                className='add__drink'
-                src='https://icons-for-free.com/download-icon-circle+more+plus+icon-1320183136549593898_512.png'
-                onClick={handleShow}
-              />
+          {userIsAdmin && (
+            <AddCard handleShow={handleShow}>
               <ModalAddDrink
                 show={showModal}
-                save={save}
                 handleClose={handleClose}
-                name={name}
-                image={image}
+                setIsLoading={setIsLoading}
+                getAllDrinks={getAllDrinks}
               />
-            </Card.Body>
-          </Card>
+            </AddCard>
+          )}
         </div>
       )}
     </>

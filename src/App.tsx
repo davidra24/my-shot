@@ -12,12 +12,14 @@ import { Drinks } from './pages/Drinks';
 import { Orders } from './pages/Orders';
 import { useDispatch } from 'react-redux';
 import { setUserAction } from './redux/actions';
+import { StateModel } from './models/redux.model';
+import { useSelector } from 'react-redux';
 
 const auth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
 
 function App() {
-  const [user, setUser] = useState<UserModel>();
+  const user = useSelector((state: StateModel) => state.reducer.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -36,7 +38,6 @@ function App() {
         email: userFirebase.email,
         role
       };
-      setUser(userData);
       dispatch(setUserAction(userData));
     });
   }
@@ -46,25 +47,25 @@ function App() {
       if (userFirebase) {
         setUserWithFirebaseAndRol(userFirebase);
       } else {
-        setUser(undefined);
+        dispatch(setUserAction(undefined));
       }
     });
   }, []);
 
   const logout = () => {
     signOut(auth);
-    setUser(undefined);
+    dispatch(setUserAction(undefined));
     navigate('/', { replace: true });
   };
 
   return (
     <div className='App'>
       <header className='App-header'>
-        <Navbar user={user} logout={logout} />
+        <Navbar logout={logout} />
       </header>
       {user ? (
         <Routes>
-          <Route path='/' element={<Main user={user} />} />
+          <Route path='/' element={<Main />} />
           <Route path='/drinks' element={<Drinks />} />
           <Route path='/orders' element={<Orders />} />
         </Routes>
